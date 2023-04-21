@@ -61,7 +61,8 @@ public class EventPublicService {
                     .collect(Collectors.toList());
         }
         Pageable pageable = PageRequest.of(from, size);
-        List<Event> events = storage.searchEventPub(text.toLowerCase(), categories, paid, dateStartSearch, dateEndSearch, State.PUBLISHED, pageable);
+      //  List<Event> events = storage.searchEventPub(text.toLowerCase(), categories, paid, dateStartSearch, dateEndSearch, State.PUBLISHED, pageable);
+        List<Event> events = storage.searchEventPub(text, categories, paid, dateStartSearch, dateEndSearch, State.PUBLISHED, pageable);
         // Только события у которых не исчерпан лимит запросов на участие
         if (onlyAvailable) {
             events = events.stream()
@@ -70,7 +71,7 @@ public class EventPublicService {
         }
         List<EventShortDto> eventShorts = events.stream()
                 .map(EventMapper::toShortDto)
-                .peek(e -> e.setViews(viewsEvent(rangeStart, rangeEnd, "event/" + e.getId(), false)))
+                .peek(e -> e.setViews(viewsEvent(rangeStart, rangeEnd, "/events/" + e.getId(), false)))
                 .collect(Collectors.toList());
         // Вариант сортировки по количеству просмотров
         if (sort.equals("VIEWS")) {

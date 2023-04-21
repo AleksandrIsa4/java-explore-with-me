@@ -4,6 +4,7 @@ import com.sun.istack.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.mapper.EndpointHitMapper;
 import ru.practicum.model.EndpointHit;
@@ -22,6 +23,7 @@ public class StatsController {
     private final StatsService statsService;
 
     @PostMapping(value = "/hit")
+    @ResponseStatus(HttpStatus.CREATED)
     public EndpointHitDto save(@RequestBody EndpointHitDto dto) {
         log.info("Post hit with dto {}", dto);
         EndpointHit endpointHit = EndpointHitMapper.toEntity(dto);
@@ -36,6 +38,7 @@ public class StatsController {
                                   @RequestParam(defaultValue = "false") boolean unique
     ) {
         log.info("Get stats with start {}, end {}, uris {}, unique {}", start, end, uris, unique);
-        return statsService.get(start, end, uris, unique);
+        List<ViewStatsDto> viewStatsDtos = statsService.get(start, end, uris, unique);
+        return viewStatsDtos;
     }
 }

@@ -72,15 +72,15 @@ public class EventAdminService {
         }
         Pageable pageable = PageRequest.of(from, size);
         List<Event> events = storage.findAllByInitiatorIdInAndStateInAndCategoryIdInAndEventDateIsAfterAndEventDateIsBefore(users, statesEnum, categories, dateStartSearch, dateEndSearch, pageable);
-
         return events.stream()
                 .map(EventMapper::toFullDto)
                 .peek(e -> e.setConfirmedRequests(requestRepository.countByEventIdAndStatus(e.getId(), Status.CONFIRMED)))
-                .peek(e -> e.setViews(viewsEvent(rangeStart, rangeEnd, "event/" + e.getId(), false)))
+                .peek(e -> e.setViews(viewsEvent(rangeStart, rangeEnd, "/events/" + e.getId(), false)))
                 .collect(Collectors.toList());
     }
 
     private Long viewsEvent(String rangeStart, String rangeEnd, String uris, Boolean unique) {
+       // List<ViewStatsDto> dto = statClient.getStat(rangeStart, rangeEnd, List.of(uris), unique);
         List<ViewStatsDto> dto = statClient.getStat(rangeStart, rangeEnd, List.of(uris), unique);
         return dto.size() > 0 ? dto.get(0).getHits() : 0L;
     }
@@ -97,7 +97,7 @@ public class EventAdminService {
         }
         event = updateEventAdmin(dto, event);
         EventFullDto fullDto = EventMapper.toFullDto(event);
-        fullDto.setViews(viewsEvent("1900-01-01 01:01:01", "2200-01-01 01:01:01", "event/" + eventId, false));
+        fullDto.setViews(viewsEvent(null, null, "/events/" + eventId, false));
         return fullDto;
     }
 

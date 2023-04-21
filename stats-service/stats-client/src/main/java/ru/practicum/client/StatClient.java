@@ -20,6 +20,9 @@ import java.util.Map;
 @Slf4j
 public class StatClient extends BaseClient {
 
+    private static final String START_DEFAULT = "1900-01-01 01:01:01";
+    private static final String END_DEFAULT = "2200-01-01 01:01:01";
+
     @Autowired
     public StatClient(@Value("${stat-server.url}") String serverUrl, RestTemplateBuilder builder) {
         super(
@@ -38,10 +41,10 @@ public class StatClient extends BaseClient {
     public List<ViewStatsDto> getStat(String start, String end, List<String> uris, boolean unique) {
         log.info("StatClient Get stats with start {}, end {}, uris {}, unique {}", start, end, uris, unique);
         if (start == null) {
-            start = "1900-01-01 01:01:01";
+            start = START_DEFAULT;
         }
         if (end == null) {
-            end = "2200-01-01 01:01:01";
+            end = END_DEFAULT;
         }
         Map<String, Object> parameters = Map.of(
                 "start", start,
