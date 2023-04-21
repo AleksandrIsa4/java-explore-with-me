@@ -10,8 +10,6 @@ import lombok.experimental.SuperBuilder;
 import ru.practicum.model.enumeration.StateAction;
 import ru.practicum.model.event.Location;
 
-import javax.validation.constraints.Future;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
@@ -31,7 +29,6 @@ public class UpdateEventAdminRequest {
     @Size(max = 7000, min = 20)
     String description;
 
-    @Future
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime eventDate;
 
@@ -45,7 +42,6 @@ public class UpdateEventAdminRequest {
 
     StateAction stateAction;
 
-    @NotNull
     @Size(max = 120, min = 3)
     String title;
 }

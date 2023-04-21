@@ -3,7 +3,7 @@ package ru.practicum.service.categorie;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.exceptions.DataNotFoundException;
-import ru.practicum.model.categorie.Categorie;
+import ru.practicum.model.categorie.Category;
 import ru.practicum.repository.CategoriesRepository;
 
 @Service
@@ -12,7 +12,7 @@ public class CategoriesService {
 
     private final CategoriesRepository storage;
 
-    public Categorie save(Categorie categorie) {
+    public Category save(Category categorie) {
         return storage.save(categorie);
     }
 
@@ -21,7 +21,7 @@ public class CategoriesService {
         storage.deleteById(id);
     }
 
-    public Categorie patch(Categorie categorie, Long id) {
+    public Category patch(Category categorie, Long id) {
         storage.findById(id).orElseThrow(() -> new DataNotFoundException("Categorie with id=" + id + " was not found"));
         categorie.setId(id);
         return storage.save(categorie);

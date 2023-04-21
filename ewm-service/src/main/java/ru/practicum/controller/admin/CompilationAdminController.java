@@ -35,9 +35,7 @@ public class CompilationAdminController {
 
     @PatchMapping(value = "/{compId}")
     public CompilationDto patchEventAdmin(@PathVariable Long compId, @RequestBody UpdateCompilationRequest dto) {
-        log.info("Patch Admin Event with dto={}, compId={}}", dto,compId);
-        return compilationAdminService.patchCompilationAdmin(dto,compId);
+        log.info("Patch Admin Event with dto={}, compId={}}", dto, compId);
+        return compilationAdminService.patchCompilationAdmin(dto, compId);
     }
-
-
 }

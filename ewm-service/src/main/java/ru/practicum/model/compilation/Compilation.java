@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import ru.practicum.abstraction.BaseModel;
-import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.model.event.Event;
 
 import javax.persistence.*;

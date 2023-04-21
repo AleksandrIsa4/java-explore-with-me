@@ -2,24 +2,17 @@ package ru.practicum.service.compilation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.compilation.CompilationDto;
 import ru.practicum.dto.compilation.NewCompilationDto;
 import ru.practicum.dto.compilation.UpdateCompilationRequest;
-import ru.practicum.dto.event.EventFullDto;
-import ru.practicum.dto.event.UpdateEventUserRequest;
-import ru.practicum.exceptions.ConflictException;
 import ru.practicum.exceptions.DataNotFoundException;
 import ru.practicum.mapper.CompilationMapper;
-import ru.practicum.mapper.EventMapper;
-import ru.practicum.model.categorie.Categorie;
 import ru.practicum.model.compilation.Compilation;
-import ru.practicum.model.enumeration.State;
 import ru.practicum.model.event.Event;
-import ru.practicum.model.user.User;
 import ru.practicum.repository.CompilationRepository;
 import ru.practicum.repository.EventRepository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -30,6 +23,7 @@ public class CompilationAdminService {
 
     private final EventRepository eventRepository;
 
+    @Transactional
     public CompilationDto postCompilation(NewCompilationDto dto) {
         Compilation compilation = CompilationMapper.toEntity(dto);
         List<Event> events = eventRepository.findAllById(dto.getEvents());
@@ -38,6 +32,7 @@ public class CompilationAdminService {
         return CompilationMapper.toDto(compilation);
     }
 
+    @Transactional
     public void deleteCompilation(Long id) {
         storage.findById(id).orElseThrow(() -> new DataNotFoundException("Compilation with id=" + id + " was not found"));
         storage.deleteById(id);
@@ -49,6 +44,7 @@ public class CompilationAdminService {
         return CompilationMapper.toDto(compilation);
     }
 
+    @Transactional
     private Compilation updateCompilationAdmin(UpdateCompilationRequest dto, Compilation compilation) {
         if (dto.getPinned() != null) {
             compilation.setPinned(dto.getPinned());
@@ -57,7 +53,7 @@ public class CompilationAdminService {
             compilation.setTitle(dto.getTitle());
         }
         if (dto.getEvents() != null || dto.getEvents().size() != 0) {
-            List<Event> events=eventRepository.findAllById(dto.getEvents());
+            List<Event> events = eventRepository.findAllById(dto.getEvents());
             compilation.setEvents(events);
         }
         compilation = storage.save(compilation);

@@ -22,7 +22,7 @@ public class RequestPrivateController {
     @ResponseStatus(HttpStatus.CREATED)
     public ParticipationRequestDto postRequestPriv(@PathVariable Long userId, @RequestParam @NotNull long eventId) {
         log.info("Post Request with userId {}, eventId {}", userId, eventId);
-        return requestPrivateService.saveRequestPriv(userId,eventId);
+        return requestPrivateService.saveRequestPriv(userId, eventId);
     }
 
     @GetMapping(value = "/{userId}/requests")
@@ -32,10 +32,8 @@ public class RequestPrivateController {
     }
 
     @PatchMapping(value = "/{userId}/requests/{requesId}/cancel")
-    public ParticipationRequestDto patchRequestPriv(@PathVariable Long userId,@PathVariable Long requesId) {
-        log.info("Patch Request with userId {}, requesId {}", userId,requesId);
-        return requestPrivateService.patchRequestPriv(userId,requesId);
+    public ParticipationRequestDto patchRequestPriv(@PathVariable Long userId, @PathVariable Long requesId) {
+        log.info("Patch Request with userId {}, requesId {}", userId, requesId);
+        return requestPrivateService.patchRequestPriv(userId, requesId);
     }
-
-
 }

@@ -20,8 +20,8 @@ public class CompilationPublicController {
     public List<CompilationDto> getAllCompilationPub(@RequestParam(defaultValue = "false") Boolean pinned,
                                                      @RequestParam(name = "from", defaultValue = "0") int from,
                                                      @RequestParam(name = "size", defaultValue = "10") int size) {
-        log.info("Get all Compilation Public with pinned {}, from {}, size {}", pinned,from,size);
-        return compilationPublicService.getAllCompilationPub(pinned,from,size);
+        log.info("Get all Compilation Public with pinned {}, from {}, size {}", pinned, from, size);
+        return compilationPublicService.getAllCompilationPub(pinned, from, size);
     }
 
     @GetMapping(value = "/{compId}")

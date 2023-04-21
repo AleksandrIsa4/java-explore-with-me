@@ -4,19 +4,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
+import ru.practicum.client.StatClient;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.UpdateEventAdminRequest;
-import ru.practicum.dto.event.UpdateEventUserRequest;
 import ru.practicum.exceptions.ConflictException;
 import ru.practicum.exceptions.DataNotFoundException;
 import ru.practicum.mapper.EventMapper;
-import ru.practicum.model.categorie.Categorie;
+import ru.practicum.model.ViewStatsDto;
+import ru.practicum.model.categorie.Category;
 import ru.practicum.model.enumeration.State;
 import ru.practicum.model.enumeration.StateAction;
 import ru.practicum.model.enumeration.Status;
 import ru.practicum.model.event.Event;
-import ru.practicum.model.user.User;
 import ru.practicum.repository.CategoriesRepository;
 import ru.practicum.repository.EventRepository;
 import ru.practicum.repository.RequestRepository;
@@ -40,6 +39,8 @@ public class EventAdminService {
     private final UserRepository userRepository;
 
     private final RequestRepository requestRepository;
+
+    private final StatClient statClient;
 
 
     public List<EventFullDto> getEventAdmin(List<Long> users, List<String> states, List<Long> categories, String rangeStart, String rangeEnd, int from, int size) {
@@ -70,29 +71,42 @@ public class EventAdminService {
                     .collect(Collectors.toList());
         }
         Pageable pageable = PageRequest.of(from, size);
-        List<Event> events = storage.findAllByInitiatorIdInAndStateInAndCategoryIdInAndEventDateIsBeforeAndEventDateIsAfter(users, statesEnum, categories, dateStartSearch, dateEndSearch, pageable);
+        List<Event> events = storage.findAllByInitiatorIdInAndStateInAndCategoryIdInAndEventDateIsAfterAndEventDateIsBefore(users, statesEnum, categories, dateStartSearch, dateEndSearch, pageable);
+
         return events.stream()
                 .map(EventMapper::toFullDto)
                 .peek(e -> e.setConfirmedRequests(requestRepository.countByEventIdAndStatus(e.getId(), Status.CONFIRMED)))
+                .peek(e -> e.setViews(viewsEvent(rangeStart, rangeEnd, "event/" + e.getId(), false)))
                 .collect(Collectors.toList());
     }
 
+    private Long viewsEvent(String rangeStart, String rangeEnd, String uris, Boolean unique) {
+        List<ViewStatsDto> dto = statClient.getStat(rangeStart, rangeEnd, List.of(uris), unique);
+        return dto.size() > 0 ? dto.get(0).getHits() : 0L;
+    }
+
     public EventFullDto patchEventAdmin(UpdateEventAdminRequest dto, Long eventId) {
-         Event event =storage.findById(eventId).orElseThrow(() -> new DataNotFoundException("Event with id=" + eventId + " was not found"));
-        if (dto.getEventDate().isBefore(LocalDateTime.now().plusHours(1L))) {
-            throw new ConflictException("Field: eventDate. Error: должно содержать дату, которая еще не наступила. Value:" + dto.getEventDate());
+        Event event = storage.findById(eventId).orElseThrow(() -> new DataNotFoundException("Event with id=" + eventId + " was not found"));
+        if (dto.getEventDate() != null) {
+            if (dto.getEventDate().isBefore(LocalDateTime.now().plusHours(1L))) {
+                throw new ConflictException("Field: eventDate. Error: должно содержать дату, которая еще не наступила. Value:" + dto.getEventDate());
+            }
+        }
+        if (event.getState().equals(State.PUBLISHED) || event.getState().equals(State.CANCELED)) {
+            throw new ConflictException("Only pending or canceled events can be changed");
         }
         event = updateEventAdmin(dto, event);
         EventFullDto fullDto = EventMapper.toFullDto(event);
+        fullDto.setViews(viewsEvent("1900-01-01 01:01:01", "2200-01-01 01:01:01", "event/" + eventId, false));
         return fullDto;
     }
 
-    private Event updateEventAdmin(UpdateEventAdminRequest dto,Event event){
+    private Event updateEventAdmin(UpdateEventAdminRequest dto, Event event) {
         if (dto.getAnnotation() != null) {
             event.setAnnotation(dto.getAnnotation());
         }
         if (dto.getCategory() != null) {
-            Categorie categorieDto = categoriesRepository.findById(dto.getCategory()).orElseThrow(() -> new DataNotFoundException("Category with id=" + dto.getCategory() + " was not found"));
+            Category categorieDto = categoriesRepository.findById(dto.getCategory()).orElseThrow(() -> new DataNotFoundException("Category with id=" + dto.getCategory() + " was not found"));
             event.setCategory(categorieDto);
         }
         if (dto.getDescription() != null) {
@@ -125,6 +139,4 @@ public class EventAdminService {
         event = storage.save(event);
         return event;
     }
-
-
 }

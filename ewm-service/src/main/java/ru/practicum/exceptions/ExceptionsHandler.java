@@ -20,8 +20,8 @@ import java.util.Collections;
 @Slf4j
 public class ExceptionsHandler {
 
-    StringWriter stringWriter = new StringWriter();
-    PrintWriter printWriter = new PrintWriter(stringWriter);
+    StringWriter sw = new StringWriter();
+    PrintWriter pw = new PrintWriter(sw);
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -48,14 +48,13 @@ public class ExceptionsHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiError handleNotFound(final DataNotFoundException notFoundException) {
         log.warn("404 {}", notFoundException.getMessage());
-        notFoundException.printStackTrace(printWriter);
-
+        notFoundException.printStackTrace(pw);
         return ApiError.builder()
-                .errors(Collections.singletonList(stringWriter.toString()))
-                .status(HttpStatus.CONFLICT)
+                .errors(Collections.singletonList(sw.toString()))
+                .status(HttpStatus.NOT_FOUND)
                 .reason("The required object was not found.")
                 .message(notFoundException.getMessage())
                 .timestamp(LocalDateTime.now().toString())
@@ -63,16 +62,29 @@ public class ExceptionsHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handleNotFound(final ConflictException conflictException) {
-        log.warn("404 {}", conflictException.getMessage());
-        conflictException.printStackTrace(printWriter);
-
+        log.warn("409 {}", conflictException.getMessage());
+        conflictException.printStackTrace(pw);
         return ApiError.builder()
-                .errors(Collections.singletonList(stringWriter.toString()))
-                .status(HttpStatus.NOT_FOUND)
-                .reason("The required object was not found.")
+                .errors(Collections.singletonList(sw.toString()))
+                .status(HttpStatus.CONFLICT)
+                .reason("Integrity constraint has been violated.")
                 .message(conflictException.getMessage())
+                .timestamp(LocalDateTime.now().toString())
+                .build();
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleNotFound(final BadRequestException badRequestException) {
+        log.warn("400 {}", badRequestException.getMessage());
+        badRequestException.printStackTrace(pw);
+        return ApiError.builder()
+                .errors(Collections.singletonList(sw.toString()))
+                .status(HttpStatus.BAD_REQUEST)
+                .reason("Incorrectly made request.")
+                .message(badRequestException.getMessage())
                 .timestamp(LocalDateTime.now().toString())
                 .build();
     }
@@ -81,10 +93,9 @@ public class ExceptionsHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiError handleInternalServerError(final Throwable throwable) {
         log.error("500 {}", throwable.getMessage(), throwable);
-        throwable.printStackTrace(printWriter);
-
+        throwable.printStackTrace(pw);
         return ApiError.builder()
-                .errors(Collections.singletonList(stringWriter.toString()))
+                .errors(Collections.singletonList(sw.toString()))
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .reason("Integrity constraint has been violated.")
                 .message(throwable.getMessage())
@@ -92,12 +103,12 @@ public class ExceptionsHandler {
                 .build();
     }
 
+
     private ApiError badRequest(final Exception e) {
         log.error("400 {}", e.getMessage());
-        e.printStackTrace(printWriter);
-
+        e.printStackTrace(pw);
         return ApiError.builder()
-                .errors(Collections.singletonList(stringWriter.toString()))
+                .errors(Collections.singletonList(sw.toString()))
                 .status(HttpStatus.BAD_REQUEST)
                 .reason("Incorrectly made request.")
                 .message(e.getMessage())
@@ -107,15 +118,13 @@ public class ExceptionsHandler {
 
     private ApiError conflict(final Exception e) {
         log.error("409 {}", e.getMessage());
-        e.printStackTrace(printWriter);
-
+        e.printStackTrace(pw);
         return ApiError.builder()
-                .errors(Collections.singletonList(stringWriter.toString()))
+                .errors(Collections.singletonList(sw.toString()))
                 .status(HttpStatus.CONFLICT)
                 .reason("Integrity constraint has been violated.")
                 .message(e.getMessage())
                 .timestamp(LocalDateTime.now().toString())
                 .build();
     }
-
 }

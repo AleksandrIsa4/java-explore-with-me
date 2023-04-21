@@ -16,7 +16,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "categories", schema = "public")
 @SuperBuilder
-public class Categorie extends BaseModel<Long> {
+public class Category extends BaseModel<Long> {
 
     @Column(name = "name")
     String name;

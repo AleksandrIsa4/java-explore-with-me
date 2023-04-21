@@ -20,8 +20,8 @@ public class CategoriesPublicController {
     @GetMapping
     public List<CategoryDto> getAllCompilationPub(@RequestParam(name = "from", defaultValue = "0") int from,
                                                   @RequestParam(name = "size", defaultValue = "10") int size) {
-        log.info("Get all Categories Public with from {}, size {}",from,size);
-        return categoriesPublicService.getAllCategoriesPub(from,size);
+        log.info("Get all Categories Public with from {}, size {}", from, size);
+        return categoriesPublicService.getAllCategoriesPub(from, size);
     }
 
     @GetMapping(value = "/{catId}")

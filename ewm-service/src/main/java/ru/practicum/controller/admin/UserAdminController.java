@@ -14,8 +14,6 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.util.Arrays.stream;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/admin/users")
@@ -42,9 +40,9 @@ public class UserAdminController {
 
     @GetMapping
     public List<UserDto> getUser(@RequestParam List<Long> ids,
-                        @RequestParam(name = "from", defaultValue = "0") int from,
-                        @RequestParam(name = "size", defaultValue = "10") int size) {
+                                 @RequestParam(name = "from", defaultValue = "0") int from,
+                                 @RequestParam(name = "size", defaultValue = "10") int size) {
         log.info("Get User with ids={}", ids);
-        return userService.get(ids,from,size).stream().map(UserMapper::toDto).collect(Collectors.toList());
+        return userService.get(ids, from, size).stream().map(UserMapper::toDto).collect(Collectors.toList());
     }
 }

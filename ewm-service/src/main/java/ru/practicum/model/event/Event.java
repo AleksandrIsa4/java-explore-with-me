@@ -8,11 +8,12 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import ru.practicum.abstraction.BaseModel;
-import ru.practicum.model.categorie.Categorie;
+import ru.practicum.model.categorie.Category;
 import ru.practicum.model.user.User;
 import ru.practicum.model.enumeration.State;
 
 import javax.persistence.*;
+import javax.validation.constraints.Future;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
@@ -29,7 +30,7 @@ public class Event extends BaseModel<Long> {
 
     @ManyToOne()
     @JoinColumn(name = "category_id")
-    Categorie category;
+    Category category;
 
     @Column(name = "created_on")
     LocalDateTime createdOn;
@@ -39,6 +40,7 @@ public class Event extends BaseModel<Long> {
 
     @Column(name = "event_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @Future
     LocalDateTime eventDate;
 
     @ManyToOne()

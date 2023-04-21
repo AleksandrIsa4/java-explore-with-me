@@ -1,6 +1,5 @@
 package ru.practicum.abstraction;
 
-import lombok.Builder;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;

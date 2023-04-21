@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.dto.categorie.CategoryDto;
 import ru.practicum.exceptions.DataNotFoundException;
 import ru.practicum.mapper.CategoryMapper;
-import ru.practicum.model.categorie.Categorie;
+import ru.practicum.model.categorie.Category;
 import ru.practicum.repository.CategoriesRepository;
 
 import java.util.List;
@@ -22,15 +22,14 @@ public class CategoriesPublicService {
 
     public List<CategoryDto> getAllCategoriesPub(int from, int size) {
         Pageable pageable = PageRequest.of(from, size);
-        //List<Categorie> categories=new ArrayList<>();
-        Page<Categorie> categories=storage.findAll(pageable);
+        Page<Category> categories = storage.findAll(pageable);
         return categories.stream()
                 .map(CategoryMapper::toDto)
                 .collect(Collectors.toList());
     }
 
-    public  CategoryDto getCategoriesPub(Long catId) {
-        Categorie categorie=storage.findById(catId).orElseThrow(() -> new DataNotFoundException("Category with id=" + catId + " was not found"));
+    public CategoryDto getCategoriesPub(Long catId) {
+        Category categorie = storage.findById(catId).orElseThrow(() -> new DataNotFoundException("Category with id=" + catId + " was not found"));
         return CategoryMapper.toDto(categorie);
     }
 }

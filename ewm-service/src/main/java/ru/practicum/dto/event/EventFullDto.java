@@ -9,10 +9,9 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import ru.practicum.abstraction.BaseModel;
 import ru.practicum.dto.user.UserShortDto;
-import ru.practicum.model.categorie.Categorie;
+import ru.practicum.model.categorie.Category;
 import ru.practicum.model.event.Location;
 import ru.practicum.model.enumeration.State;
-import ru.practicum.model.user.User;
 
 import java.time.LocalDateTime;
 
@@ -25,7 +24,7 @@ public class EventFullDto extends BaseModel<Long> {
 
     String annotation;
 
-    Categorie category;
+    Category category;
 
     Long confirmedRequests;
 
