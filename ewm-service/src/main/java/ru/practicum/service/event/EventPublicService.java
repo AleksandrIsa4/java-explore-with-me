@@ -41,7 +41,7 @@ public class EventPublicService {
     public EventFullDto getEventPub(Long id, HttpServletRequest request) {
         Event event = storage.findById(id).orElseThrow(() -> new DataNotFoundException("Event with id=" + id + " was not found"));
         EventFullDto fullDto = EventMapper.toFullDto(event);
-        saveHit(request, List.of(id));
+        saveHit(request, id);
         return fullDto;
     }
 
@@ -61,7 +61,6 @@ public class EventPublicService {
                     .collect(Collectors.toList());
         }
         Pageable pageable = PageRequest.of(from, size);
-      //  List<Event> events = storage.searchEventPub(text.toLowerCase(), categories, paid, dateStartSearch, dateEndSearch, State.PUBLISHED, pageable);
         List<Event> events = storage.searchEventPub(text, categories, paid, dateStartSearch, dateEndSearch, State.PUBLISHED, pageable);
         // Только события у которых не исчерпан лимит запросов на участие
         if (onlyAvailable) {
@@ -78,11 +77,7 @@ public class EventPublicService {
             eventShorts.stream()
                     .sorted(Comparator.comparing(EventShortDto::getViews));
         }
-        List<Long> indexEvent = eventShorts.stream()
-                .map(e -> e.getId())
-                .collect(Collectors.toList());
-        // Сохранение информации о том, что на uri конкретного сервиса был отправлен запрос пользователем.
-        saveHit(request, indexEvent);
+        saveHit(request, null);
         return eventShorts;
     }
 
@@ -95,15 +90,16 @@ public class EventPublicService {
         return dto.size() > 0 ? dto.get(0).getHits() : 0L;
     }
 
-    private void saveHit(HttpServletRequest request, List<Long> listEventId) {
-        for (Long eventId : listEventId) {
-            EndpointHitDto endpointHitDto = EndpointHitDto.builder()
-                    .app("ewm-service")
-                    .uri("/events/" + eventId)
-                    .ip(request.getRemoteAddr())
-                    .timestamp(LocalDateTime.now())
-                    .build();
-            statClient.postStat(endpointHitDto);
+    private void saveHit(HttpServletRequest request, Long eventId) {
+        EndpointHitDto endpointHitDto = new EndpointHitDto();
+        endpointHitDto.setApp("ewm-service");
+        endpointHitDto.setTimestamp(LocalDateTime.now());
+        endpointHitDto.setIp(request.getRemoteAddr());
+        if (eventId == null) {
+            endpointHitDto.setUri("/events");
+        } else {
+            endpointHitDto.setUri("/events/" + eventId);
         }
+        statClient.postStat(endpointHitDto);
     }
 }

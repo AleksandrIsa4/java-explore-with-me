@@ -20,7 +20,7 @@ public class StatsService {
     }
 
     public List<ViewStatsDto> get(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
-        if (uris == null || uris.isEmpty() || uris.contains("/events")) {
+            if (uris == null || uris.isEmpty()) {
             if (unique) {
                 return storage.getStatsUnique(start, end);
             } else {
