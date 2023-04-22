@@ -1,5 +1,7 @@
 package ru.practicum.exceptions;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,7 @@ import java.util.Collections;
 
 @RestControllerAdvice
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ExceptionsHandler {
 
     StringWriter sw = new StringWriter();

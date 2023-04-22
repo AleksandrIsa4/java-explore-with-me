@@ -6,7 +6,12 @@ import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.dto.event.NewEventDto;
 import ru.practicum.dto.event.UpdateEventUserRequest;
+import ru.practicum.model.categorie.Category;
+import ru.practicum.model.enumeration.State;
 import ru.practicum.model.event.Event;
+import ru.practicum.model.user.User;
+
+import java.time.LocalDateTime;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class EventMapper {
@@ -53,6 +58,23 @@ public final class EventMapper {
                 .participantLimit(dto.getParticipantLimit())
                 .requestModeration(dto.getRequestModeration())
                 .title(dto.getTitle())
+                .build();
+    }
+
+    public static Event toEntitySave(NewEventDto dto, Category categorie, User initiator) {
+        return Event.builder()
+                .annotation(dto.getAnnotation())
+                .description(dto.getDescription())
+                .eventDate(dto.getEventDate())
+                .location(dto.getLocation())
+                .paid(dto.getPaid())
+                .participantLimit(dto.getParticipantLimit())
+                .requestModeration(dto.getRequestModeration())
+                .title(dto.getTitle())
+                .createdOn(LocalDateTime.now())
+                .initiator(initiator)
+                .category(categorie)
+                .state(State.PENDING)
                 .build();
     }
 

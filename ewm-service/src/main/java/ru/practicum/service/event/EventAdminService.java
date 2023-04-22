@@ -80,7 +80,6 @@ public class EventAdminService {
     }
 
     private Long viewsEvent(String rangeStart, String rangeEnd, String uris, Boolean unique) {
-       // List<ViewStatsDto> dto = statClient.getStat(rangeStart, rangeEnd, List.of(uris), unique);
         List<ViewStatsDto> dto = statClient.getStat(rangeStart, rangeEnd, List.of(uris), unique);
         return dto.size() > 0 ? dto.get(0).getHits() : 0L;
     }

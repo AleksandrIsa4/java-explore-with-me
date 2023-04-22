@@ -50,19 +50,15 @@ public class EventPrivateService {
 
 
     public EventFullDto saveEventPriv(NewEventDto dto, Long userId) {
-        Event event = EventMapper.toEntity(dto);
         if (dto.getEventDate().isBefore(LocalDateTime.now())) {
             throw new ConflictException("Field: eventDate. Error: Должно содержать дату, которая еще не наступила. Value:" + dto.getEventDate());
         }
         if (dto.getEventDate().isBefore(LocalDateTime.now().plusHours(2L))) {
             throw new BadRequestException("Field: eventDate. Error: Дата и время на которые намечено событие не может быть раньше, чем через два часа от текущего момента. Value:" + dto.getEventDate());
         }
-        event.setCreatedOn(LocalDateTime.now());
         Category categorie = categoriesRepository.findById(dto.getCategory()).orElseThrow(() -> new DataNotFoundException("Category with id=" + dto.getCategory() + " was not found"));
-        event.setCategory(categorie);
         User initiator = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("User with id=" + userId + " was not found"));
-        event.setInitiator(initiator);
-        event.setState(State.PENDING);
+        Event event = EventMapper.toEntitySave(dto,categorie,initiator);
         event = storage.save(event);
         EventFullDto fullDto = EventMapper.toFullDto(event);
         UserShortDto userShortDto = UserMapper.toDtoShort(initiator);
@@ -156,7 +152,7 @@ public class EventPrivateService {
 
     @Transactional
     public EventRequestStatusUpdateResult patchEventRequestsPriv(EventRequestStatusUpdateRequest dto, Long userId, Long eventId) {
-        User initiator = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("User with id=" + userId + " was not found"));
+        userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("User with id=" + userId + " was not found"));
         Event event = storage.findById(eventId).orElseThrow(() -> new DataNotFoundException("Event with id=" + eventId + " was not found"));
         List<Request> requests = requestRepository.findByIdIn(dto.getRequestIds());
         Long countRequest = requestRepository.countByEventId(event.getId());
