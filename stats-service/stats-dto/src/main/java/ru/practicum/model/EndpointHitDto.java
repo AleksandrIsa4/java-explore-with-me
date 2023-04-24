@@ -13,6 +13,13 @@ import java.time.LocalDateTime;
 @Builder
 public class EndpointHitDto {
 
+    public EndpointHitDto(String app, String uri, String ip, LocalDateTime timestamp) {
+        this.app = app;
+        this.uri = uri;
+        this.ip = ip;
+        this.timestamp = timestamp;
+    }
+
     Long id;
 
     String app;
