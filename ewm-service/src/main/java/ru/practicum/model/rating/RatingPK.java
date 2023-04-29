@@ -16,7 +16,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
-@Table(name = "rating", schema = "public")
 @SuperBuilder
 @Embeddable
 public class RatingPK implements Serializable {

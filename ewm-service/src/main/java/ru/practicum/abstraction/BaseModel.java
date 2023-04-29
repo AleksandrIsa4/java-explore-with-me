@@ -3,10 +3,11 @@ package ru.practicum.abstraction;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @MappedSuperclass
 @SuperBuilder
-public abstract class BaseModel<T> {
+public abstract class BaseModel<T> implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
