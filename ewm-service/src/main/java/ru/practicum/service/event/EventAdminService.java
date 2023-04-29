@@ -16,10 +16,7 @@ import ru.practicum.model.enumeration.State;
 import ru.practicum.model.enumeration.StateAction;
 import ru.practicum.model.enumeration.Status;
 import ru.practicum.model.event.Event;
-import ru.practicum.repository.CategoriesRepository;
-import ru.practicum.repository.EventRepository;
-import ru.practicum.repository.RequestRepository;
-import ru.practicum.repository.UserRepository;
+import ru.practicum.repository.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -39,6 +36,8 @@ public class EventAdminService {
     private final UserRepository userRepository;
 
     private final RequestRepository requestRepository;
+
+    private final RatingRepository ratingRepository;
 
     private final StatClient statClient;
 
@@ -97,6 +96,7 @@ public class EventAdminService {
         event = updateEventAdmin(dto, event);
         EventFullDto fullDto = EventMapper.toFullDto(event);
         fullDto.setViews(viewsEvent(null, null, "/events/" + eventId, false));
+        fullDto.setRating(ratingRepository.sumLike(eventId));
         return fullDto;
     }
 

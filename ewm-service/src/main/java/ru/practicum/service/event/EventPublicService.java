@@ -17,6 +17,7 @@ import ru.practicum.model.enumeration.Status;
 import ru.practicum.model.event.Event;
 import ru.practicum.repository.CategoriesRepository;
 import ru.practicum.repository.EventRepository;
+import ru.practicum.repository.RatingRepository;
 import ru.practicum.repository.RequestRepository;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,11 +37,14 @@ public class EventPublicService {
 
     private final RequestRepository requestRepository;
 
+    private final RatingRepository ratingRepository;
+
     private final StatClient statClient;
 
     public EventFullDto getEventPub(Long id, HttpServletRequest request) {
         Event event = storage.findById(id).orElseThrow(() -> new DataNotFoundException("Event with id=" + id + " was not found"));
         EventFullDto fullDto = EventMapper.toFullDto(event);
+        fullDto.setRating(ratingRepository.sumLike(id));
         saveHit(request, id);
         return fullDto;
     }
@@ -71,11 +75,21 @@ public class EventPublicService {
         List<EventShortDto> eventShorts = events.stream()
                 .map(EventMapper::toShortDto)
                 .peek(e -> e.setViews(viewsEvent(rangeStart, rangeEnd, "/events/" + e.getId(), false)))
+                .peek(e -> e.setRating(ratingRepository.sumLike(e.getId())))
                 .collect(Collectors.toList());
-        // Вариант сортировки по количеству просмотров
-        if (sort.equals("VIEWS")) {
-            eventShorts.stream()
-                    .sorted(Comparator.comparing(EventShortDto::getViews));
+        // Вариант сортировки
+        switch (sort) {
+            case "VIEWS":
+                eventShorts = eventShorts.stream()
+                        .sorted(Comparator.comparing(EventShortDto::getViews))
+                        .collect(Collectors.toList());
+                break;
+            case "RATING":
+                eventShorts = eventShorts.stream()
+                        //       .peek(e -> e.setRating(checkLike(e)))
+                        .sorted(Comparator.comparing(EventShortDto::getRating).reversed())
+                        .collect(Collectors.toList());
+                break;
         }
         saveHit(request, null);
         return eventShorts;
@@ -91,10 +105,11 @@ public class EventPublicService {
     }
 
     private void saveHit(HttpServletRequest request, Long eventId) {
-        EndpointHitDto endpointHitDto = new EndpointHitDto();
-        endpointHitDto.setApp("ewm-service");
-        endpointHitDto.setTimestamp(LocalDateTime.now());
-        endpointHitDto.setIp(request.getRemoteAddr());
+        EndpointHitDto endpointHitDto = EndpointHitDto.builder()
+                .app("ewm-service")
+                .timestamp(LocalDateTime.now())
+                .ip(request.getRemoteAddr())
+                .build();
         if (eventId == null) {
             endpointHitDto.setUri("/events");
         } else {

@@ -32,6 +32,8 @@ public final class EventMapper {
                 .requestModeration(event.getRequestModeration())
                 .state(event.getState())
                 .title(event.getTitle())
+                .rating(0L)
+                .views(0L)
                 .build();
     }
 
@@ -45,6 +47,8 @@ public final class EventMapper {
                 .initiator(UserMapper.toDtoShort(event.getInitiator()))
                 .paid(event.getPaid())
                 .title(event.getTitle())
+                .rating(0L)
+                .views(0L)
                 .build();
     }
 

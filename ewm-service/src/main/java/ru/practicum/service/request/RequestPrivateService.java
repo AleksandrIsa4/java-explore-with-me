@@ -32,14 +32,14 @@ public class RequestPrivateService {
 
     @Transactional
     public ParticipationRequestDto saveRequestPriv(Long userId, Long eventId) {
-        User initiator = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("User with id=" + userId + " was not found"));
+        User requester = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("User with id=" + userId + " was not found"));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new DataNotFoundException("Event with id=" + eventId + " was not found"));
         checkPostRequest(event, userId);
         Request request;
         if (event.getRequestModeration()) {
-            request = new Request(LocalDateTime.now(), event, initiator, Status.PENDING);
+            request = new Request(LocalDateTime.now(), event, requester, Status.PENDING);
         } else {
-            request = new Request(LocalDateTime.now(), event, initiator, Status.CONFIRMED);
+            request = new Request(LocalDateTime.now(), event, requester, Status.CONFIRMED);
         }
         request = storage.save(request);
         ParticipationRequestDto dto = RequestMapper.toDto(request);
