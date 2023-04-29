@@ -1,9 +1,8 @@
 {
   "info": {
-    "_postman_id": "51a3e082-d4af-4b8a-9116-e2aa2364e3b9",
+    "_postman_id": "19aaf650-f77a-49f0-9269-2675b33b37a6",
     "name": "Test Like",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "24296182"
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
@@ -710,8 +709,9 @@
               "    pm.response.to.be.json;\r",
               "});\r",
               "\r",
+              "const target = pm.response.json();\r",
               "const target1 = pm.response.json()[0];\r",
-              "const target2 = pm.response.json()[1];\r",
+              "const target2 = pm.response.json()[target.length-1];\r",
               "\r",
               "pm.test(\"События должны содержать поле rating\", function () {\r",
               "pm.expect(target1).to.have.property('rating');\r",

@@ -2,6 +2,7 @@ package ru.practicum.service.rating;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.client.StatClient;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.exceptions.ConflictException;
@@ -32,6 +33,7 @@ public class RatingPrivateService {
 
     private final StatClient statClient;
 
+    @Transactional
     public EventFullDto postRatingEvent(Long userId, Long eventId, Long like) {
         checkRequest(eventId, userId);
         User user = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("User with id=" + userId + " was not found"));
@@ -60,6 +62,7 @@ public class RatingPrivateService {
         return dto.size() > 0 ? dto.get(0).getHits() : 0L;
     }
 
+    @Transactional
     public EventFullDto patchRatingEvent(Long userId, Long eventId, Long like) {
         User user = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("User with id=" + userId + " was not found"));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new DataNotFoundException("Event with id=" + eventId + " was not found"));
@@ -77,6 +80,7 @@ public class RatingPrivateService {
         return fullDto;
     }
 
+    @Transactional
     public EventFullDto deleteRatingEvent(Long userId, Long eventId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("User with id=" + userId + " was not found"));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new DataNotFoundException("Event with id=" + eventId + " was not found"));

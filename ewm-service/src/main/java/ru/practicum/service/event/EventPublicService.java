@@ -86,7 +86,6 @@ public class EventPublicService {
                 break;
             case "RATING":
                 eventShorts = eventShorts.stream()
-                        //       .peek(e -> e.setRating(checkLike(e)))
                         .sorted(Comparator.comparing(EventShortDto::getRating).reversed())
                         .collect(Collectors.toList());
                 break;
