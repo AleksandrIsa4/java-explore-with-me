@@ -54,4 +54,6 @@ public class EventFullDto extends BaseModel<Long> {
     String title;
 
     Long views;
+
+    Long rating;
 }

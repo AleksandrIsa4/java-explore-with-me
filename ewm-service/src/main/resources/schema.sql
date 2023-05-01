@@ -4,6 +4,7 @@ DROP table IF EXISTS events cascade;
 DROP table IF EXISTS request cascade;
 DROP table IF EXISTS compilation cascade;
 DROP table IF EXISTS compilation_event cascade;
+DROP table IF EXISTS rating cascade;
 
 CREATE TABLE IF NOT EXISTS categories
 (
@@ -70,4 +71,14 @@ CREATE TABLE IF NOT EXISTS compilation_event
     CONSTRAINT pk_compilation_event PRIMARY KEY (compilation_id, event_id),
     CONSTRAINT fk_compilation_id_compilation_event FOREIGN KEY (compilation_id) REFERENCES compilation (id),
     CONSTRAINT fk_event_id_compilation_event FOREIGN KEY (event_id) REFERENCES events (id)
+);
+
+CREATE TABLE IF NOT EXISTS rating
+(
+    user_id    BIGINT NOT NULL,
+    event_id   BIGINT NOT NULL,
+    like_event BIGINT NOT NULL,
+    CONSTRAINT pk_grade PRIMARY KEY (user_id, event_id),
+    CONSTRAINT fk_event_id_grade FOREIGN KEY (user_id) REFERENCES users (id),
+    CONSTRAINT fk_event_id_gradet FOREIGN KEY (event_id) REFERENCES events (id)
 );

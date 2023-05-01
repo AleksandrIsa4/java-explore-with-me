@@ -38,4 +38,6 @@ public class EventShortDto extends BaseModel<Long> {
     Long views;
 
     String description;
+
+    Long rating;
 }

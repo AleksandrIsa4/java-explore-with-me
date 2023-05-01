@@ -12,7 +12,6 @@ import ru.practicum.dto.event.UpdateEventUserRequest;
 import ru.practicum.dto.request.EventRequestStatusUpdateRequest;
 import ru.practicum.dto.request.EventRequestStatusUpdateResult;
 import ru.practicum.dto.request.ParticipationRequestDto;
-import ru.practicum.dto.user.UserShortDto;
 import ru.practicum.exceptions.BadRequestException;
 import ru.practicum.exceptions.ConflictException;
 import ru.practicum.exceptions.DataNotFoundException;
@@ -26,10 +25,7 @@ import ru.practicum.model.enumeration.State;
 import ru.practicum.model.enumeration.Status;
 import ru.practicum.model.request.Request;
 import ru.practicum.model.user.User;
-import ru.practicum.repository.CategoriesRepository;
-import ru.practicum.repository.EventRepository;
-import ru.practicum.repository.RequestRepository;
-import ru.practicum.repository.UserRepository;
+import ru.practicum.repository.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -48,6 +44,8 @@ public class EventPrivateService {
 
     private final RequestRepository requestRepository;
 
+    private final RatingRepository ratingRepository;
+
 
     public EventFullDto saveEventPriv(NewEventDto dto, Long userId) {
         if (dto.getEventDate().isBefore(LocalDateTime.now())) {
@@ -58,11 +56,12 @@ public class EventPrivateService {
         }
         Category categorie = categoriesRepository.findById(dto.getCategory()).orElseThrow(() -> new DataNotFoundException("Category with id=" + dto.getCategory() + " was not found"));
         User initiator = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("User with id=" + userId + " was not found"));
-        Event event = EventMapper.toEntitySave(dto,categorie,initiator);
+        Event event = EventMapper.toEntitySave(dto, categorie, initiator);
         event = storage.save(event);
         EventFullDto fullDto = EventMapper.toFullDto(event);
-        UserShortDto userShortDto = UserMapper.toDtoShort(initiator);
-        fullDto.setInitiator(userShortDto);
+        fullDto.setConfirmedRequests(requestRepository.countByEventIdAndStatus(fullDto.getId(), Status.CONFIRMED));
+        fullDto.setInitiator(UserMapper.toDtoShort(initiator));
+        fullDto.setRating(ratingRepository.sumLike(fullDto.getId()));
         return fullDto;
     }
 
@@ -73,6 +72,8 @@ public class EventPrivateService {
         return events.stream()
                 .map(EventMapper::toShortDto)
                 .peek(e -> e.setConfirmedRequests(requestRepository.countByEventIdAndStatus(e.getId(), Status.CONFIRMED)))
+                .peek(e -> e.setInitiator(UserMapper.toDtoShort(initiator)))
+                .peek(e -> e.setRating(ratingRepository.sumLike(e.getId())))
                 .collect(Collectors.toList());
     }
 
@@ -81,6 +82,7 @@ public class EventPrivateService {
         storage.findById(eventId).orElseThrow(() -> new DataNotFoundException("Event with id=" + eventId + " was not found"));
         Event event = storage.findByInitiatorIdAndId(initiator.getId(), eventId);
         EventFullDto fullDto = EventMapper.toFullDto(event);
+        fullDto.setRating(ratingRepository.sumLike(eventId));
         return fullDto;
     }
 
@@ -98,6 +100,7 @@ public class EventPrivateService {
         }
         event = updateEventUserPriv(dto, event);
         EventFullDto fullDto = EventMapper.toFullDto(event);
+        fullDto.setRating(ratingRepository.sumLike(eventId));
         return fullDto;
     }
 
