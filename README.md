@@ -28,4 +28,4 @@
 # Спецификация REST API swagger
 <a href="https://raw.githubusercontent.com/yandex-praktikum/java-explore-with-me/main/ewm-main-service-spec.json" target="_blank">Основной сервис</a> 
 
-<a href="https://raw.githubusercontent.com/yandex-praktikum/java-explore-with-me/main/ewm-stats-service-spec.json" target="_blank">Сервис статистикис</a> 
+<a href="https://raw.githubusercontent.com/yandex-praktikum/java-explore-with-me/main/ewm-stats-service-spec.json" target="_blank">Сервис статистики</a> 
